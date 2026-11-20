@@ -1,0 +1,39 @@
+{
+    "name": "Game Manager Cloud",
+    "short_name": "GMC",
+    "description": "Host, manage and monitor your Game Servers fast, simple, and across all your dedicated machines.",
+    "id": "app.gamemanager.cloud",
+    "start_url": "/",
+    "dir": "ltr",
+    "scope": "/",
+    "lang": "en",
+    "orientation": "any",
+    "display": "standalone",
+    "display_override": [
+        "window-controls-overlay",
+        "standalone",
+        "minimal-ui",
+        "fullscreen",
+        "browser"
+    ],
+    "background_color": "#161c24",
+    "theme_color": "#161c24",
+    "categories": ["business", "games"],
+    "icons": [
+        {
+            "src": "/assets/favicon.png",
+            "sizes": "586x586",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/pwa/screenshot-gmc-wide-1.png",
+            "sizes": "3456x1804",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Login"
+        }
+    ]
+}
