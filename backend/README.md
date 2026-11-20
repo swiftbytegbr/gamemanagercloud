@@ -91,6 +91,11 @@ can be changed per team via the admin API.
 
 ## Docker
 
+The complete deployment (web app, backend, MongoDB behind Traefik) is in [`../docker-compose.yml`](../docker-compose.yml),
+configured via `.env` (see [`../.example.env`](../.example.env)). It builds the backend with the `prod` profile.
+
+Backend only:
+
 ```bash
 docker build --build-arg SPRING_PROFILE=prod -t gmc-backend .
 docker run -p 8080:8080 gmc-backend

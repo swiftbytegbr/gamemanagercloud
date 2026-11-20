@@ -38,7 +38,7 @@ Settings are compiled into the web app at build time (Vite `VITE_*` variables, D
 
 | Variable | Default | Description |
 |---|---|---|
-| `VITE_API_BASE_URL` | – (required) | Host of the backend without protocol, e.g. `api.example.com` (`https://` and `wss://` are added) |
+| `VITE_API_BASE_URL` | – (required) | Backend without protocol: host (`api.example.com`) or host and path (`gmc.example.com/api`, as in `docker-compose.yml`); `https://` and `wss://` are added |
 | `VITE_DISCORD_URL` | – (hidden) | Discord invite shown in the navigation and on the login page |
 | `VITE_FAQ_URL` | – (hidden) | FAQ or help page shown in the navigation |
 | `VITE_DOCS_URL` | `https://<VITE_API_BASE_URL>/api-docs/ui` | API documentation linked in the team settings |

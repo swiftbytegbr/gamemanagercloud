@@ -1,4 +1,11 @@
+# GameManagerCloud behind an existing Traefik (Docker network "proxy").
+# Web app on https://<GMC_DOMAIN>/, API on https://<GMC_DOMAIN>/api (Traefik strips /api).
+# Configuration: copy .example.env to .env and fill it in, then: docker compose up -d --build
+
 networks:
+  # Network of the Traefik container, must already exist
+  proxy:
+    external: true
   internal:
     internal: true
 
@@ -12,10 +19,15 @@ services:
       context: ./frontend
       args:
         VITE_API_BASE_URL: ${GMC_DOMAIN:?There is no domain set}/api
+        VITE_DISCORD_URL: ${GMC_DISCORD_URL:-}
+        VITE_FAQ_URL: ${GMC_FAQ_URL:-}
+        VITE_DOCS_URL: ${GMC_DOCS_URL:-}
+        VITE_DAEMON_DOWNLOAD_URL: ${GMC_DAEMON_DOWNLOAD_URL:-}
     restart: unless-stopped
     networks: [proxy]
     labels:
       - traefik.enable=true
+      - traefik.docker.network=proxy
       - traefik.http.routers.gmc-frontend.entrypoints=web
       - traefik.http.routers.gmc-frontend.rule=Host(`${GMC_DOMAIN:?There is no domain set}`)
       - traefik.http.routers.gmc-frontend.service=gmc-frontend
@@ -24,26 +36,53 @@ services:
   backend:
     build:
       context: ./backend
+      args:
+        SPRING_PROFILE: prod
     restart: unless-stopped
+    depends_on: [db]
     networks: [proxy, internal]
     environment:
-      - SPRING_DATA_MONGODB_DATABASE=${SPRING_DATA_MONGODB_DATABASE:?There is no mongodb database set}
-      - SPRING_DATA_MONGODB_HOST=db
-      - SPRING_DATA_MONGODB_PASSWORD=${SPRING_DATA_MONGODB_PASSWORD:?There is no mongodb password set}
-      - SPRING_DATA_MONGODB_USERNAME=${SPRING_DATA_MONGODB_USERNAME:?There is no mongodb username set}
-      - SPRING_DATA_MONGODB_AUTHENTICATIONDATABASE=${SPRING_DATA_MONGODB_AUTHDB:-admin}
+      # Database (Spring Boot 4: spring.mongodb.*)
+      - SPRING_MONGODB_HOST=db
+      - SPRING_MONGODB_DATABASE=${SPRING_MONGODB_DATABASE:?There is no mongodb database set}
+      - SPRING_MONGODB_USERNAME=${SPRING_MONGODB_USERNAME:?There is no mongodb username set}
+      - SPRING_MONGODB_PASSWORD=${SPRING_MONGODB_PASSWORD:?There is no mongodb password set}
+      - SPRING_MONGODB_AUTHENTICATIONDATABASE=admin
 
-      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST:?There is no mail host set}
-      - SPRING_MAIL_PORT=${SPRING_MAIL_PORT:?There is no mail port set}
-      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME:?There is no mail username set}
-      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD:?There is no mail password set}
+      # E-mail (GMC_MAIL_ENABLED=false runs without SMTP server)
+      - GMC_MAIL_ENABLED=${GMC_MAIL_ENABLED:-true}
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST:-localhost}
+      - SPRING_MAIL_PORT=${SPRING_MAIL_PORT:-587}
+      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME:-}
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD:-}
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=${SPRING_MAIL_SMTP_AUTH:-true}
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=${SPRING_MAIL_SMTP_STARTTLS_ENABLE:-true}
 
+      # Instance
+      - GMC_CORS_ALLOWED_ORIGINS=https://${GMC_DOMAIN:?There is no domain set}
+      - GMC_OPERATOR_NAME=${GMC_OPERATOR_NAME:-}
+      - GMC_CONTACT_EMAIL=${GMC_CONTACT_EMAIL:-}
+      - GMC_HELPDESK_EMAIL=${GMC_HELPDESK_EMAIL:-}
+      - GMC_APPLICATIONS_EMAIL_DOMAIN=${GMC_APPLICATIONS_EMAIL_DOMAIN:-applications.invalid}
+      # Client IP: the header is only used for requests from these proxies (Traefik is in a private Docker network)
+      - GMC_TRUSTED_PROXIES=${GMC_TRUSTED_PROXIES:-10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.0/8,::1/128,fc00::/7}
+      - GMC_CLIENT_IP_HEADER=${GMC_CLIENT_IP_HEADER:-X-Forwarded-For}
+
+      # Default limits for new teams (empty = keep stored value, 0 = unlimited)
+      - GMC_LIMIT_USER_MAX_OWNED_TEAMS=${GMC_LIMIT_USER_MAX_OWNED_TEAMS:-}
+      - GMC_LIMIT_TEAM_MAX_MEMBERS=${GMC_LIMIT_TEAM_MAX_MEMBERS:-}
+      - GMC_LIMIT_TEAM_MAX_NODES=${GMC_LIMIT_TEAM_MAX_NODES:-}
+      - GMC_LIMIT_TEAM_MAX_SERVERS=${GMC_LIMIT_TEAM_MAX_SERVERS:-}
+      - GMC_LIMIT_SERVER_MAX_BACKUPS=${GMC_LIMIT_SERVER_MAX_BACKUPS:-}
+      - GMC_LIMIT_SERVER_MAX_RCON_COMMANDS=${GMC_LIMIT_SERVER_MAX_RCON_COMMANDS:-}
+      - GMC_LIMIT_SERVER_STATISTICS_MAX_SIZE=${GMC_LIMIT_SERVER_STATISTICS_MAX_SIZE:-}
+      - GMC_LIMIT_SERVER_MAX_LOGS=${GMC_LIMIT_SERVER_MAX_LOGS:-}
+
     labels:
       - traefik.enable=true
+      - traefik.docker.network=proxy
       - traefik.http.routers.gmc-backend.entrypoints=web
-      - traefik.http.routers.gmc-backend.rule=Host(`${GMC_DOMAIN:?There is no  domain set}`) && PathPrefix(`/api`)
+      - traefik.http.routers.gmc-backend.rule=Host(`${GMC_DOMAIN:?There is no domain set}`) && PathPrefix(`/api`)
       - traefik.http.routers.gmc-backend.service=gmc-backend
       - traefik.http.routers.gmc-backend.middlewares=gmc-strip-api-prod
       - traefik.http.services.gmc-backend.loadbalancer.server.port=8080
@@ -54,9 +93,9 @@ services:
     restart: unless-stopped
     networks: [internal]
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${SPRING_DATA_MONGODB_USERNAME:?There is no mongodb username set}
-      - MONGO_INITDB_ROOT_PASSWORD=${SPRING_DATA_MONGODB_PASSWORD:?There is no mongodb password set}
-      - MONGO_INITDB_DATABASE=${SPRING_DATA_MONGODB_DATABASE:?There is no mongodb database set}
+      - MONGO_INITDB_ROOT_USERNAME=${SPRING_MONGODB_USERNAME:?There is no mongodb username set}
+      - MONGO_INITDB_ROOT_PASSWORD=${SPRING_MONGODB_PASSWORD:?There is no mongodb password set}
+      - MONGO_INITDB_DATABASE=${SPRING_MONGODB_DATABASE:?There is no mongodb database set}
     volumes:
       - db-data:/data/db
       - db-config:/data/configdb
