@@ -159,7 +159,13 @@ public class AuthService {
 
         user.setNotificationSettings(notificationSettings);
 
-        emailSender.sendVerificationEmail(user);
+        if (emailSender.isEnabled()) {
+            emailSender.sendVerificationEmail(user);
+        } else {
+            // Without e-mail the address cannot be verified, so it is accepted as is
+            user.setEmailVerified(true);
+            user.setEmailVerificationCode(0);
+        }
         userService.save(user);
 
         // Create a session for the newly registered user and return it
@@ -184,6 +190,7 @@ public class AuthService {
 
     public void resendVerificationEmail(User user) {
         if (user.isEmailVerified()) throw new AuthenticationException("email_already_verified");
+        if (!emailSender.isEnabled()) throw new AuthenticationException("mail_disabled");
         user.setEmailVerificationCode(Generators.generateVerificationToken());
         emailSender.sendVerificationEmail(user);
         userService.save(user);
@@ -220,6 +227,7 @@ public class AuthService {
     }
 
     public void requestResetPassword(String email) {
+        if (!emailSender.isEnabled()) throw new AuthenticationException("mail_disabled");
         User user = userService.findByEmail(email).orElseThrow(NotFoundException::new);
         user.setPasswordResetCode(Generators.generatePasswordResetToken());
         emailSender.sendPasswordResetEmail(user);

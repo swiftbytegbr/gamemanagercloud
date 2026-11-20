@@ -27,6 +27,9 @@ public class HelpdeskService {
         if (helpdeskRecipient == null || helpdeskRecipient.isBlank()) {
             throw new BadRequestException("helpdesk_recipient_not_configured");
         }
+        if (!emailSender.isEnabled()) {
+            throw new BadRequestException("mail_disabled");
+        }
 
         Team team = teamService.getOrThrow(teamId);
 

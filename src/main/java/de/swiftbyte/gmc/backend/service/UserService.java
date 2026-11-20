@@ -64,9 +64,15 @@ public class UserService {
     public void changeEmail(User user, String email) {
         if (existsByEmail(email)) throw new UserException("email_already_exists");
         user.setEmail(email.toLowerCase().trim());
-        user.setEmailVerified(false);
-        user.setEmailVerificationCode(Generators.generateVerificationToken());
-        emailSender.sendVerificationEmail(user);
+        if (emailSender.isEnabled()) {
+            user.setEmailVerified(false);
+            user.setEmailVerificationCode(Generators.generateVerificationToken());
+            emailSender.sendVerificationEmail(user);
+        } else {
+            // Without e-mail the address cannot be verified, so it is accepted as is
+            user.setEmailVerified(true);
+            user.setEmailVerificationCode(0);
+        }
         save(user);
     }
 

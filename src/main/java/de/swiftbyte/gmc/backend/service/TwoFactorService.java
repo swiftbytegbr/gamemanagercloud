@@ -87,6 +87,9 @@ public class TwoFactorService {
         if (user.getTwoFAType() != null && user.getTwoFAType() != User.TwoFAType.NONE) {
             throw new UserException("twofa_already_enabled");
         }
+        if (!emailSender.isEnabled()) {
+            throw new UserException("mail_disabled");
+        }
         if (!user.isEmailVerified()) {
             throw new UserException("email_not_verified_for_2fa");
         }
@@ -138,6 +141,9 @@ public class TwoFactorService {
                 if (backupCodeService.verifyAndConsume(user, backupCode)) return;
                 throw new AuthenticationException("invalid_backup_code");
             }
+
+            // Codes cannot be delivered without e-mail; backup codes keep working (see above)
+            if (!emailSender.isEnabled()) throw new AuthenticationException("2fa_email_unavailable");
 
             user.setTwoFACode(Generators.generateVerificationToken());
             emailSender.send2faEmail(user);

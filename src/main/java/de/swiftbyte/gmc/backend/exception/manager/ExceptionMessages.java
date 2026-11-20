@@ -76,6 +76,10 @@ public class ExceptionMessages {
             Map.entry("invalid_node_auth", "Invalid node authentication. Please check your credentials."),
             Map.entry("password_invalid", "The current password is invalid."),
             Map.entry("auth.user_disabled", "This account is disabled by an administrator."),
+            Map.entry("auth.mail_disabled", "E-mails are disabled on this instance, so this action is not available."),
+            Map.entry("auth.2fa_email_unavailable", "E-mails are disabled on this instance, so no code can be sent. Use a backup code."),
+            Map.entry("user.mail_disabled", "E-mails are disabled on this instance. Use an authenticator app for two-factor authentication."),
+            Map.entry("mail_disabled", "E-mails are disabled on this instance."),
             Map.entry("session_expired", "The session is invalid or has expired."),
             Map.entry("email_already_verified", "Email is already verified."),
 

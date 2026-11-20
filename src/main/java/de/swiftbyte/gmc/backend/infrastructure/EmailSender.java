@@ -7,6 +7,7 @@ import de.swiftbyte.gmc.backend.exception.AuthenticationException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -24,12 +25,35 @@ import java.util.List;
 @Service
 public class EmailSender {
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    // Optional, so that the application also starts without any SMTP configuration
     @Autowired
-    private JavaMailSender mailSender;
+    private ObjectProvider<JavaMailSender> mailSenderProvider;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username:}")
     private String from;
+
+    // GMC_MAIL_ENABLED=false disables all e-mails (verification, 2FA codes, password reset, notifications)
+    @Value("${gmc.mail.enabled:true}")
+    private boolean enabled;
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /** Returns the mail sender, or null if mail is disabled or not configured. */
+    private JavaMailSender mailSender(String to, String subject) {
+        if (!enabled) {
+            log.debug("Mail disabled, not sending '{}' to {}", subject, to);
+            return null;
+        }
+        JavaMailSender sender = mailSenderProvider.getIfAvailable();
+        if (sender == null) log.warn("Mail is enabled but no SMTP server is configured, not sending '{}' to {}", subject, to);
+        return sender;
+    }
+
+    private void applyFrom(MimeMessageHelper helper) throws jakarta.mail.MessagingException {
+        if (from != null && !from.isBlank()) helper.setFrom(from);
+    }
 
     private String loadTemplate(String templateName) {
         try {
@@ -117,6 +141,8 @@ public class EmailSender {
     }
 
     private void sendHtmlEmail(String to, String subject, String html) {
+        JavaMailSender mailSender = mailSender(to, subject);
+        if (mailSender == null) return;
         new Thread(() -> {
             try {
                 MimeMessage message = mailSender.createMimeMessage();
@@ -124,7 +150,7 @@ public class EmailSender {
                 helper.setTo(to);
                 helper.setSubject(subject);
                 helper.setText(html, true);
-                helper.setFrom(from);
+                applyFrom(helper);
                 mailSender.send(message);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -164,13 +190,15 @@ public class EmailSender {
     }
 
     public void sendPlainEmailWithReplyTo(String to, String subject, String body, List<String> replyTo) {
+        JavaMailSender mailSender = mailSender(to, subject);
+        if (mailSender == null) return;
         new Thread(() -> {
             try {
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
                 helper.setTo(to);
                 helper.setSubject(subject);
-                helper.setFrom(from);
+                applyFrom(helper);
                 helper.setText(body, false);
 
                 if (replyTo != null && !replyTo.isEmpty()) {
@@ -200,13 +228,15 @@ public class EmailSender {
     }
 
     public void sendPlainEmailWithReplyTo(String to, String subject, String body, String replyTo) {
+        JavaMailSender mailSender = mailSender(to, subject);
+        if (mailSender == null) return;
         new Thread(() -> {
             try {
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
                 helper.setTo(to);
                 helper.setSubject(subject);
-                helper.setFrom(from);
+                applyFrom(helper);
                 helper.setText(body, false);
                 if (replyTo != null && !replyTo.isBlank()) {
                     helper.setReplyTo(replyTo);

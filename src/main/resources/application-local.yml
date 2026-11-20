@@ -10,6 +10,7 @@ spring:
   main:
     banner-mode: off
 
+  # E-mail is off locally unless GMC_MAIL_ENABLED=true and the SMTP_* variables are set
   mail:
     host: ${SMTP_HOST:localhost}
     port: ${SMTP_PORT:587}
@@ -33,6 +34,8 @@ logging:
 
 # GameManager Cloud custom configuration
 gmc:
+  mail:
+    enabled: ${GMC_MAIL_ENABLED:false}
   security:
     permission-cache:
       ttl-millis: 300000
@@ -45,3 +48,8 @@ gmc:
   helpdesk:
     email:
       to: "contact@swiftbyte.de"
+
+management:
+  health:
+    mail:
+      enabled: ${GMC_MAIL_ENABLED:false}
