@@ -1,0 +1,32 @@
+spring:
+  data:
+    mongodb:
+      auto-index-creation: true
+  main:
+    banner-mode: off
+
+logging:
+  level:
+    org.springframework.web: ERROR
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
+
+# Sentry
+sentry:
+  dsn: ${SENTRY_DSN:}
+
+
+# GameManager Cloud custom configuration
+gmc:
+  server:
+    statistics:
+      max-size: 200
+      min-interval-seconds: 300
+  security:
+    permission-cache:
+      ttl-millis: 300000
+  cors:
+    allowed-origins: "https://dev.gamemanager.cloud,http://localhost:5173,https://dev-admin.gamemanager.cloud"
+    set-samesite-none: true
+    secure-cookies: true
+  session:
+    cookie-domain: "dev.gamemanager.cloud"

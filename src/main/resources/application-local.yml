@@ -1,0 +1,60 @@
+spring:
+  mongodb:
+    host: ${MONGODB_HOST:localhost}
+    port: ${MONGODB_PORT:27017}
+    database: ${MONGODB_DATABASE:gmc-dev}
+    password: ${MONGODB_PASSWORD:}
+    username: ${MONGODB_USERNAME:admin}
+    authentication-database: admin
+
+  main:
+    banner-mode: off
+
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+
+logging:
+  level:
+    de.swiftbyte.gmc.service: DEBUG
+    org.springframework.web: ERROR
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
+
+
+# GameManager Cloud custom configuration
+gmc:
+  security:
+    permission-cache:
+      ttl-millis: 300000
+  cors:
+    allowed-origins: "http://localhost:5173,http://127.0.0.1:5173"
+    set-samesite-none: true
+    secure-cookies: false
+  session:
+    cookie-domain: "localhost"
+  helpdesk:
+    email:
+      to: "contact@swiftbyte.de"
+
+
+
+paddle.api:
+  # Base URL for Paddle API (e.g., sandbox or production)
+  base-url: "https://sandbox-api.paddle.com"
+  # API key used for Paddle authentication
+  api-key: "${PADDLE_API_KEY:}"
+
+  webhook-enabled: true
+  webhook-path: "/paddle/webhook"
+  webhook:
+    secret: "${PADDLE_WEBHOOK_SECRET:}"
