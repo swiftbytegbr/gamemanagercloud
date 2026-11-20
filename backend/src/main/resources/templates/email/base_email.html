@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GameManagerCloud Email</title>
+    <!-- Declare dark mode support to avoid client auto-inversion -->
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
+    <style>
+        /* Signal dark color scheme to clients that honor CSS instead of meta */
+        :root {
+            color-scheme: dark;
+            supported-color-schemes: dark;
+        }
+
+        /* Basic resets for email clients */
+        html, body {
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        body {
+            background: #212b36;
+            color: #fff;
+            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 40px auto;
+            background: #212b36;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+            padding: 32px 24px 24px 24px;
+        }
+
+        .header {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #018bff;
+            margin-bottom: 16px;
+        }
+
+        .token, .ip {
+            display: inline-block;
+            background: #018bff;
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 10px 24px;
+            border-radius: 8px;
+            margin: 24px 0;
+            letter-spacing: 2px;
+        }
+
+        .token-wrapper, .ip-wrapper {
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 32px;
+            font-size: 0.9em;
+            color: #aaa;
+            border-top: 1px solid #333;
+            padding-top: 16px;
+            text-align: center;
+        }
+
+        /* Ensure links remain readable on dark */
+        a { color: #66b3ff; }
+
+        /* Dark mode reinforcement for clients that auto-invert (Apple Mail etc.) */
+        @media (prefers-color-scheme: dark) {
+            body { background: #212b36 !important; color: #ffffff !important; }
+            .container { background: #212b36 !important; box-shadow: 0 2px 12px rgba(0,0,0,0.2) !important; }
+            .header { color: #018bff !important; }
+            .token, .ip { background: #018bff !important; color: #ffffff !important; }
+            .footer { color: #aaaaaa !important; border-top-color: #333333 !important; }
+            a { color: #66b3ff !important; }
+        }
+
+        /* Outlook (iOS/Android) dark mode targeting */
+        [data-ogsc] body { background: #212b36 !important; color: #ffffff !important; }
+        [data-ogsc] .container { background: #212b36 !important; }
+        [data-ogsc] .header { color: #018bff !important; }
+        [data-ogsc] .token, [data-ogsc] .ip { background: #018bff !important; color: #ffffff !important; }
+        [data-ogsc] .footer { color: #aaaaaa !important; border-top-color: #333333 !important; }
+        [data-ogsc] a { color: #66b3ff !important; }
+    </style>
+</head>
+<body style="background-color:#212b36;color:#ffffff;" bgcolor="#212b36">
+<div class="container">
+    {{content}}
+    <div class="footer">
+        Swiftbyte Kaspereit Faust GbR | <a href="mailto:contact@swiftbyte.de" style="color:#aaa;text-decoration:none;">contact@swiftbyte.de</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+spring:
+  mongodb:
+    host: ${MONGODB_HOST:localhost}
+    port: ${MONGODB_PORT:27017}
+    database: ${MONGODB_DATABASE:gmc-dev}
+    password: ${MONGODB_PASSWORD:}
+    username: ${MONGODB_USERNAME:admin}
+    authentication-database: admin
+
+  main:
+    banner-mode: off
+
+  # E-mail is off locally unless GMC_MAIL_ENABLED=true and the SMTP_* variables are set
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+
+logging:
+  level:
+    de.swiftbyte.gmc.service: DEBUG
+    org.springframework.web: ERROR
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
+
+
+# GameManager Cloud custom configuration
+gmc:
+  mail:
+    enabled: ${GMC_MAIL_ENABLED:false}
+  security:
+    permission-cache:
+      ttl-millis: 300000
+  cors:
+    allowed-origins: "http://localhost:5173,http://127.0.0.1:5173"
+    set-samesite-none: true
+    secure-cookies: false
+  session:
+    cookie-domain: "localhost"
+  helpdesk:
+    email:
+      to: "contact@swiftbyte.de"
+
+management:
+  health:
+    mail:
+      enabled: ${GMC_MAIL_ENABLED:false}

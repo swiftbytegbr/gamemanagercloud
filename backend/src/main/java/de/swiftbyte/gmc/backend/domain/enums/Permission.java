@@ -1,0 +1,11 @@
+package de.swiftbyte.gmc.backend.domain.enums;
+
+public enum Permission {
+    ACCESS_TEAM, MANAGE_TEAM,
+    ACCESS_NODES, MANAGE_NODES,
+    ACCESS_SERVERS, MANAGE_SERVERS,
+    ACCESS_LOGS, MANAGE_LOGS,
+    ACCESS_PROFILES, MANAGE_PROFILES,
+    ACCESS_AUTOMATIONS, MANAGE_AUTOMATIONS,
+    ALL;
+}
