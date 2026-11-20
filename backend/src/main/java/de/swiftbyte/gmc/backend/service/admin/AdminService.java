@@ -88,9 +88,13 @@ public class AdminService {
         configRepository.save(new GmcConfig().setId("defaultLimits").setValue(limits));
     }
 
+    // Built-in defaults, used when the defaultLimits document is created (0 = unlimited).
+    // Can be changed via the admin API or with GMC_LIMIT_* environment variables.
     public LimitsConfig defaultLimits() {
-        // All zero defaults; can be edited via admin API
-        return new LimitsConfig();
+        LimitsConfig limits = new LimitsConfig();
+        // Statistics of a server are stored in one document, so they must be bounded
+        limits.serverStatisticsMaxSize = 200;
+        return limits;
     }
 
     public AdminStatsDto getSystemStats() {
