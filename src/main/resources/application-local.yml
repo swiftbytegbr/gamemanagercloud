@@ -45,16 +45,3 @@ gmc:
   helpdesk:
     email:
       to: "contact@swiftbyte.de"
-
-
-
-paddle.api:
-  # Base URL for Paddle API (e.g., sandbox or production)
-  base-url: "https://sandbox-api.paddle.com"
-  # API key used for Paddle authentication
-  api-key: "${PADDLE_API_KEY:}"
-
-  webhook-enabled: true
-  webhook-path: "/paddle/webhook"
-  webhook:
-    secret: "${PADDLE_WEBHOOK_SECRET:}"

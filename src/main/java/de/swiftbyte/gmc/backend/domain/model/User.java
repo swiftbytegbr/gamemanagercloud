@@ -31,8 +31,6 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
-    private String paddleCustomerId;
-
     private String password;
 
     private String passwordResetCode;

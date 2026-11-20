@@ -7,7 +7,6 @@ import de.swiftbyte.gmc.backend.exception.UserException;
 import de.swiftbyte.gmc.backend.infrastructure.EmailSender;
 import de.swiftbyte.gmc.backend.repository.TeamRepository;
 import de.swiftbyte.gmc.backend.repository.UserRepository;
-import de.swiftbyte.gmc.backend.service.payment.PaddleCustomerService;
 import de.swiftbyte.gmc.backend.util.Generators;
 import de.swiftbyte.gmc.common.model.NotificationSeverity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +29,6 @@ public class UserService {
 
     @Autowired
     private TeamRepository teamRepository;
-    @Autowired
-    private PaddleCustomerService paddleCustomerService;
     @Autowired
     private ImageService imageService;
 
@@ -71,10 +68,6 @@ public class UserService {
         user.setEmailVerificationCode(Generators.generateVerificationToken());
         emailSender.sendVerificationEmail(user);
         save(user);
-
-        // Only sync if a Paddle customer already exists
-        if (user.getPaddleCustomerId() != null && !user.getPaddleCustomerId().isBlank())
-            paddleCustomerService.syncUserToPaddle(user);
     }
 
     public void changePassword(User user, String oldPassword, String newPassword) {
@@ -121,10 +114,6 @@ public class UserService {
             user.setPersonalInformation(personalInformation);
         }
         save(user);
-
-        // Only sync if a Paddle customer already exists
-        if (user.getPaddleCustomerId() != null && !user.getPaddleCustomerId().isBlank())
-            paddleCustomerService.syncUserToPaddle(user);
     }
 
     /**
@@ -156,10 +145,6 @@ public class UserService {
         user.setCompanyInformation(companyInformation);
 
         save(user);
-
-        // Only sync if a Paddle customer already exists
-        if (user.getPaddleCustomerId() != null && !user.getPaddleCustomerId().isBlank())
-            paddleCustomerService.syncUserToPaddle(user);
     }
 
     public void changeNotificationSettings(User user, User.NotificationSettings notificationSettings) {

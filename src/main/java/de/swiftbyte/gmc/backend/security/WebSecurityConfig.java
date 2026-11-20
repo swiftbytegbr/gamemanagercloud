@@ -55,7 +55,6 @@ public class WebSecurityConfig {
                 .requestMatchers("/node/register").permitAll()
                 // Public ASA admin list exposure for server integration
                 .requestMatchers("/server/*/ark/asa/adminlist.txt").permitAll()
-                .requestMatchers("/paddle/webhook").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
             );

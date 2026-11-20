@@ -12,7 +12,6 @@ import de.swiftbyte.gmc.backend.infrastructure.EmailSender;
 import de.swiftbyte.gmc.backend.infrastructure.StompSender;
 import de.swiftbyte.gmc.backend.repository.NodeRepository;
 import de.swiftbyte.gmc.backend.repository.TeamRepository;
-import de.swiftbyte.gmc.backend.service.payment.PaddleCustomerService;
 import de.swiftbyte.gmc.backend.util.Generators;
 import de.swiftbyte.gmc.backend.util.StringSanitizer;
 import de.swiftbyte.gmc.common.packet.from.backend.team.TeamChangePacket;
@@ -66,8 +65,6 @@ public class TeamService {
     @Autowired
     private StompSender stompSender;
     @Autowired
-    private PaddleCustomerService paddleCustomerService;
-    @Autowired
     private ImageService imageService;
 
 
@@ -104,7 +101,6 @@ public class TeamService {
         limitService.applyTeamDefaults(team);
         team = teamRepository.save(team);
 
-        // No longer auto-sync to Paddle on team creation
         return team;
     }
 
