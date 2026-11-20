@@ -10,15 +10,21 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 COPY . .
 
 ARG VITE_MODE=dev
-RUN apt-get update
-RUN apt-get install ca-certificates -y
+# Instance settings, compiled into the web app (see README.md)
+# Host of the backend without protocol, e.g. api.example.com (required)
+ARG VITE_API_BASE_URL
+# Optional links; empty = hidden (Discord, FAQ) or built-in default (docs, daemon download)
+ARG VITE_DISCORD_URL=
+ARG VITE_FAQ_URL=
+ARG VITE_DOCS_URL=
+ARG VITE_DAEMON_DOWNLOAD_URL=
+RUN test -n "$VITE_API_BASE_URL" || (echo "Build argument VITE_API_BASE_URL is required, e.g. api.example.com" >&2; exit 1)
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    --mount=type=secret,id=SENTRY_AUTH_TOKEN \
-    if [ -f /run/secrets/SENTRY_AUTH_TOKEN ]; then \
-        export SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)"; \
-    fi && \
     pnpm exec tsc -b && pnpm exec vite build --mode ${VITE_MODE}
 
 FROM caddy:2.11.7-alpine
+ARG VITE_API_BASE_URL
+# Used in the Content-Security-Policy of the Caddyfile
+ENV GMC_API_HOST=${VITE_API_BASE_URL}
 COPY --from=build /app/dist /srv
 COPY Caddyfile /etc/caddy/Caddyfile

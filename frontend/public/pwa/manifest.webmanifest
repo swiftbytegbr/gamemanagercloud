@@ -2,7 +2,7 @@
     "name": "Game Manager Cloud",
     "short_name": "GMC",
     "description": "Host, manage and monitor your Game Servers fast, simple, and across all your dedicated machines.",
-    "id": "app.gamemanager.cloud",
+    "id": "/",
     "start_url": "/",
     "dir": "ltr",
     "scope": "/",

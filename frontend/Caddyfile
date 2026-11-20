@@ -1,3 +1,4 @@
+# GMC_API_HOST (host of the backend, e.g. api.example.com) is set from the build argument VITE_API_BASE_URL, see Dockerfile.
 :80 {
     root * /srv
     encode zstd gzip
@@ -10,7 +11,7 @@
                Cross-Origin-Resource-Policy "cross-origin"
                # Relaxed to avoid blocking cross-origin resources needed by password manager
                # Cross-Origin-Embedder-Policy "credentialless"
-               Content-Security-Policy "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; frame-src 'none'; form-action 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; script-src-elem 'self' 'unsafe-inline'; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline' data: blob: https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' data: blob: https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.gamemanager.cloud https://glitchtip.swiftbyte.de wss://*.gamemanager.cloud; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests;"
+               Content-Security-Policy "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; frame-src 'none'; form-action 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; script-src-elem 'self' 'unsafe-inline'; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline' data: blob: https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' data: blob: https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://{$GMC_API_HOST} wss://{$GMC_API_HOST}; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests;"
                Cache-Control "no-store"
            }
     @immutable {

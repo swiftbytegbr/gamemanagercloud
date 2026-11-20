@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import DiscordLogo from "@/assets/discord-logo.svg";
+import { appConfig } from "@/config.ts";
 import { Centered } from "@/components/Centered.tsx";
 
 interface LoginLayoutProps {
@@ -21,16 +22,18 @@ export function LoginLayout(props: LoginLayoutProps) {
                     <h4 className="text-2xl text-muted-foreground font-light mt-1">
                         Host your game on your own server
                     </h4>
-                    <a
-                        className="mt-16"
-                        href="https://discord.com/invite/RRvv3YXqFV"
-                        target="_blank">
-                        <img
-                            className="h-24"
-                            src={DiscordLogo}
-                            alt="Discord Logo"
-                        />
-                    </a>
+                    {appConfig.discordUrl && (
+                        <a
+                            className="mt-16"
+                            href={appConfig.discordUrl}
+                            target="_blank">
+                            <img
+                                className="h-24"
+                                src={DiscordLogo}
+                                alt="Discord Logo"
+                            />
+                        </a>
+                    )}
                 </Centered>
             </div>
         </div>

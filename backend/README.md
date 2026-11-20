@@ -29,7 +29,7 @@ frontend dev server (`http://localhost:5173`) and disables e-mail by default.
 | Profile | Purpose |
 |---|---|
 | `local` | Local development (default). Database via `MONGODB_*`, SMTP via `SMTP_*`, e-mail off unless `GMC_MAIL_ENABLED=true` |
-| `dev`, `prod` | The former hosted environments (`*.gamemanager.cloud`). Database and SMTP are not configured in the files and come from Spring Boot's standard properties (`spring.mongodb.*`, `spring.mail.*`) |
+| `dev`, `prod` | Server deployments (`dev` sends `SameSite=None` cookies). Database and SMTP are not configured in the files and come from Spring Boot's standard properties (`spring.mongodb.*`, `spring.mail.*`, e.g. `SPRING_MONGODB_URI`) |
 
 Select a profile with `SPRING_PROFILES_ACTIVE`, in Docker with `--build-arg SPRING_PROFILE=<profile>`.
 
@@ -40,15 +40,28 @@ Select a profile with `SPRING_PROFILES_ACTIVE`, in Docker with `--build-arg SPRI
 | `MONGODB_HOST`, `MONGODB_PORT`, `MONGODB_DATABASE`, `MONGODB_USERNAME`, `MONGODB_PASSWORD` | `localhost`, `27017`, `gmc-dev`, `admin`, – | Database (`local` profile, authentication database `admin`) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | `localhost`, `587`, –, – | SMTP server (`local` profile). The username is also the sender address |
 | `GMC_MAIL_ENABLED` | `true` (`false` in `local`) | `false` disables all e-mails, see below |
-| `gmc.cors.allowed-origins` | `*` | Comma-separated origins of the web app |
+| `GMC_OPERATOR_NAME` | – | Operator shown in the e-mail footer |
+| `GMC_CONTACT_EMAIL` | – | Contact address in the e-mail footer and in security e-mails ("contact us at ..."); without it the e-mails refer to the administrator of the instance |
+| `GMC_HELPDESK_EMAIL` | – | Recipient of bug reports from the web app; empty disables bug reports |
+| `GMC_CORS_ALLOWED_ORIGINS` | `*` (`local`: `http://localhost:5173,http://127.0.0.1:5173`) | Comma-separated origins of the web app, e.g. `https://gmc.example.com` |
+| `GMC_COOKIE_DOMAIN` | – (`local`: `localhost`) | Domain of the session cookie |
+| `GMC_TRUSTED_PROXIES` | `10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.0/8,::1/128,fc00::/7` | Comma-separated IPs or CIDR ranges of your reverse proxies, see below |
+| `GMC_CLIENT_IP_HEADER` | `X-Forwarded-For` | Header with the client IP; `CF-Connecting-IP` behind Cloudflare |
+| `GMC_APPLICATIONS_EMAIL_DOMAIN` | `applications.invalid` | Domain of the generated logins of API applications (`<application>@<team>.<domain>`); these addresses never receive e-mail |
 | `gmc.cors.secure-cookies`, `gmc.cors.set-samesite-none` | `true`, `false` | Session cookie flags |
-| `gmc.session.cookie-domain` | – | Domain of the session cookie |
-| `gmc.helpdesk.email.to` | `contact@swiftbyte.de` | Recipient of bug reports from the web app |
 | `SENTRY_DSN` | – | Optional error reporting (`dev`, `prod`) |
 | `GMC_LIMIT_*` | see below | Default limits |
 
 Properties can also be set as environment variables using Spring Boot's naming rules, e.g. `GMC_CORS_ALLOWEDORIGINS`
 for `gmc.cors.allowed-origins`.
+
+### Client IP
+
+The client IP is used for sessions, login notifications and node connections. The header from `GMC_CLIENT_IP_HEADER`
+is only used if the request comes from an address in `GMC_TRUSTED_PROXIES`; otherwise the address of the connection is
+used, so clients cannot fake their IP. With `X-Forwarded-For` the list is read from the right and the first address
+that is not a trusted proxy is used. Set `GMC_TRUSTED_PROXIES` to the addresses of your proxies, or to an empty value if
+the backend is reached directly.
 
 ### Without e-mail
 

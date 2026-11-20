@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils.ts";
 import { useAuthStore } from "@/store/authStore.ts";
 import { CreateTeamForm } from "@/components/start-popups/CreateTeamForm.tsx";
 import { dialog, hasDialogByTag } from "@/store/dialogStore.tsx";
-import { EarlyAccessDialog } from "@/components/start-popups/EarlyAccessDialog.tsx";
 import { VerifyEmailForm } from "@/components/start-popups/VerifyEmailForm.tsx";
 
 export const MainLayout = () => {
@@ -65,18 +64,6 @@ export const MainLayout = () => {
             });
         }
     }, [isLoading, isAuthenticated, user, teams]);
-
-    useEffect(() => {
-        if (isLoading) return;
-        if (!isAuthenticated) return;
-        if (!user) return;
-        if (hasDialogByTag("early-access")) return;
-        const shouldShow = sessionStorage.getItem("gmc_show_early_access");
-        if (shouldShow === "1") {
-            sessionStorage.removeItem("gmc_show_early_access");
-            dialog(<EarlyAccessDialog />, { tag: "early-access" });
-        }
-    }, [isLoading, isAuthenticated, user]);
 
     return (
         <AuthGuard guard="authenticated">

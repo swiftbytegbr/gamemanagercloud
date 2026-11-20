@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useState } from "react";
+import { appConfig } from "@/config.ts";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -164,10 +165,10 @@ export function TeamSettingsPage() {
                             Discord bots, access to GMC. These require an API
                             key for authentication. You can learn more here:{" "}
                             <Link
-                                to="https://docs.gamemanager.cloud"
+                                to={appConfig.docsUrl}
                                 className="text-primary"
                                 target="_blank">
-                                https://docs.gamemanager.cloud
+                                {appConfig.docsUrl}
                             </Link>
                         </p>
                         <Button
