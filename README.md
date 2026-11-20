@@ -67,12 +67,6 @@ db.users.updateOne({ email: "you@example.com" }, { $set: { accountType: "ADMIN" 
 
 Admins can use the admin API under `/api/admin/…` (e.g. default limits under `/api/admin/limits`).
 
-### Update
-
-```bash
-git pull
-docker compose up -d --build
-```
 
 ### Backup
 
