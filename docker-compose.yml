@@ -59,7 +59,8 @@ services:
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=${SPRING_MAIL_SMTP_STARTTLS_ENABLE:-true}
 
       # Instance
-      - GMC_CORS_ALLOWED_ORIGINS=https://${GMC_DOMAIN:?There is no domain set}
+      - GMC_CORS_ALLOWED_ORIGINS=${GMC_CORS_ALLOWED_ORIGINS:-https://${GMC_DOMAIN:?There is no domain set}}
+      - GMC_COOKIE_DOMAIN=${GMC_COOKIE_DOMAIN:-}
       - GMC_OPERATOR_NAME=${GMC_OPERATOR_NAME:-}
       - GMC_CONTACT_EMAIL=${GMC_CONTACT_EMAIL:-}
       - GMC_HELPDESK_EMAIL=${GMC_HELPDESK_EMAIL:-}
@@ -67,6 +68,9 @@ services:
       # Client IP: the header is only used for requests from these proxies (Traefik is in a private Docker network)
       - GMC_TRUSTED_PROXIES=${GMC_TRUSTED_PROXIES:-10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.0/8,::1/128,fc00::/7}
       - GMC_CLIENT_IP_HEADER=${GMC_CLIENT_IP_HEADER:-X-Forwarded-For}
+
+      # Optional error reporting
+      - SENTRY_DSN=${SENTRY_DSN:-}
 
       # Default limits for new teams (empty = keep stored value, 0 = unlimited)
       - GMC_LIMIT_USER_MAX_OWNED_TEAMS=${GMC_LIMIT_USER_MAX_OWNED_TEAMS:-}
