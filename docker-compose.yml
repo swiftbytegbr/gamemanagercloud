@@ -1,0 +1,62 @@
+networks:
+  internal:
+    internal: true
+
+volumes:
+  db-data:
+  db-config:
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ${GMC_DOMAIN:?There is no domain set}/api
+    restart: unless-stopped
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gmc-frontend.entrypoints=web
+      - traefik.http.routers.gmc-frontend.rule=Host(`${GMC_DOMAIN:?There is no domain set}`)
+      - traefik.http.routers.gmc-frontend.service=gmc-frontend
+      - traefik.http.services.gmc-frontend.loadbalancer.server.port=80
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    networks: [proxy, internal]
+    environment:
+      - SPRING_DATA_MONGODB_DATABASE=${SPRING_DATA_MONGODB_DATABASE:?There is no mongodb database set}
+      - SPRING_DATA_MONGODB_HOST=db
+      - SPRING_DATA_MONGODB_PASSWORD=${SPRING_DATA_MONGODB_PASSWORD:?There is no mongodb password set}
+      - SPRING_DATA_MONGODB_USERNAME=${SPRING_DATA_MONGODB_USERNAME:?There is no mongodb username set}
+      - SPRING_DATA_MONGODB_AUTHENTICATIONDATABASE=${SPRING_DATA_MONGODB_AUTHDB:-admin}
+
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST:?There is no mail host set}
+      - SPRING_MAIL_PORT=${SPRING_MAIL_PORT:?There is no mail port set}
+      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME:?There is no mail username set}
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD:?There is no mail password set}
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=${SPRING_MAIL_SMTP_AUTH:-true}
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=${SPRING_MAIL_SMTP_STARTTLS_ENABLE:-true}
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gmc-backend.entrypoints=web
+      - traefik.http.routers.gmc-backend.rule=Host(`${GMC_DOMAIN:?There is no  domain set}`) && PathPrefix(`/api`)
+      - traefik.http.routers.gmc-backend.service=gmc-backend
+      - traefik.http.routers.gmc-backend.middlewares=gmc-strip-api-prod
+      - traefik.http.services.gmc-backend.loadbalancer.server.port=8080
+      - traefik.http.middlewares.gmc-strip-api-prod.stripprefix.prefixes=/api
+
+  db:
+    image: mongo:latest
+    restart: unless-stopped
+    networks: [internal]
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${SPRING_DATA_MONGODB_USERNAME:?There is no mongodb username set}
+      - MONGO_INITDB_ROOT_PASSWORD=${SPRING_DATA_MONGODB_PASSWORD:?There is no mongodb password set}
+      - MONGO_INITDB_DATABASE=${SPRING_DATA_MONGODB_DATABASE:?There is no mongodb database set}
+    volumes:
+      - db-data:/data/db
+      - db-config:/data/configdb

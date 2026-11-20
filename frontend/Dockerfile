@@ -10,6 +10,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 COPY . .
 
 ARG VITE_MODE=dev
+ARG VITE_API_BASE_URL
 RUN apt-get update
 RUN apt-get install ca-certificates -y
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
