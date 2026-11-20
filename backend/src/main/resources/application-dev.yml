@@ -25,8 +25,5 @@ gmc:
     permission-cache:
       ttl-millis: 300000
   cors:
-    allowed-origins: "https://dev.gamemanager.cloud,http://localhost:5173,https://dev-admin.gamemanager.cloud"
     set-samesite-none: true
     secure-cookies: true
-  session:
-    cookie-domain: "dev.gamemanager.cloud"

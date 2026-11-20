@@ -1,4 +1,5 @@
 import { DialogClose, DialogFooter } from "@/components/ui/dialog.tsx";
+import { appConfig } from "@/config.ts";
 import { FormInput } from "@/components/custom/form/FormInput.tsx";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button.tsx";
@@ -114,7 +115,7 @@ export function CreateNodeDialog(props: CreateNodeDialogOneProps) {
                             <div className="flex">
                                 <Link
                                     className="w-full"
-                                    to="https://github.com/swiftbytegbr/gmc-daemon/releases/latest/download/gmc-daemon-setup.exe"
+                                    to={appConfig.daemonDownloadUrl}
                                     target="_blank">
                                     <Button
                                         variant="outline"
@@ -162,7 +163,7 @@ export function CreateNodeDialog(props: CreateNodeDialogOneProps) {
                             <div className="flex">
                                 <Link
                                     className="w-full"
-                                    to="https://github.com/swiftbytegbr/gmc-daemon/releases/latest/download/gmc-daemon-setup.exe"
+                                    to={appConfig.daemonDownloadUrl}
                                     target="_blank">
                                     <Button
                                         variant="outline"

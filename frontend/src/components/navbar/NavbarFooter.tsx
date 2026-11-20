@@ -7,34 +7,39 @@ import { ReportDialog } from "@/components/ReportDialog.tsx";
 import { useActiveTeam } from "@/store/teamStore.ts";
 import { TeamPicture } from "@/components/custom/TeamPicture.tsx";
 import { TeamSelectDialog } from "@/components/team/dialogs/TeamSelectDialog.tsx";
+import { appConfig } from "@/config.ts";
 
 export function NavbarFooter() {
     const activeTeam = useActiveTeam();
 
     return (
         <div className="mt-auto mb-3 text-left text-muted-secondary">
-            <Link
-                className="text-muted-foreground"
-                to="https://discord.com/invite/RRvv3YXqFV"
-                target="_blank">
-                <div className="flex items-center gap-1 justify-start h-6">
-                    <img
-                        className="size-4"
-                        src={DiscordIcon}
-                        alt="Discord Icon"
-                    />
-                    <small>Discord</small>
-                </div>
-            </Link>
-            <Link
-                className="text-muted-foreground"
-                to="https://gamemanager.cloud/faq"
-                target="_blank">
-                <div className="flex items-center gap-1 justify-start h-6">
-                    <img className="size-4" src={FAQIcon} alt="Discord Icon" />
-                    <small>FAQ</small>
-                </div>
-            </Link>
+            {appConfig.discordUrl && (
+                <Link
+                    className="text-muted-foreground"
+                    to={appConfig.discordUrl}
+                    target="_blank">
+                    <div className="flex items-center gap-1 justify-start h-6">
+                        <img
+                            className="size-4"
+                            src={DiscordIcon}
+                            alt="Discord Icon"
+                        />
+                        <small>Discord</small>
+                    </div>
+                </Link>
+            )}
+            {appConfig.faqUrl && (
+                <Link
+                    className="text-muted-foreground"
+                    to={appConfig.faqUrl}
+                    target="_blank">
+                    <div className="flex items-center gap-1 justify-start h-6">
+                        <img className="size-4" src={FAQIcon} alt="FAQ Icon" />
+                        <small>FAQ</small>
+                    </div>
+                </Link>
+            )}
             <Button
                 onClick={() =>
                     dialog(<TeamSelectDialog />, {

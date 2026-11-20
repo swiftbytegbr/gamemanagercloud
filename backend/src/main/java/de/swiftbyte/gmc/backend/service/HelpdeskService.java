@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class HelpdeskService {
 
-    @Value("${gmc.helpdesk.email.to:contact@swiftbyte.de}")
+    @Value("${gmc.helpdesk.email.to:}")
     private String helpdeskRecipient;
 
     @Autowired

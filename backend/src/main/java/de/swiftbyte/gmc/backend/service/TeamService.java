@@ -16,6 +16,7 @@ import de.swiftbyte.gmc.backend.util.Generators;
 import de.swiftbyte.gmc.backend.util.StringSanitizer;
 import de.swiftbyte.gmc.common.packet.from.backend.team.TeamChangePacket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,6 +32,10 @@ import java.util.stream.Stream;
 
 @Service
 public class TeamService {
+
+    // Domain of the generated logins of API applications, see gmc.applications.email-domain
+    @Value("${gmc.applications.email-domain:applications.invalid}")
+    private String applicationsEmailDomain;
 
     // === Dependencies ===
     @Autowired
@@ -345,7 +350,7 @@ public class TeamService {
     public TeamController.CreateApplicationUserResponse createApplicationUser(Team team, String applicationName, List<Permission> permissions) {
         String local = StringSanitizer.emailSafePart(applicationName);
         String domainTeam = StringSanitizer.emailSafePart(team.getName() == null ? "" : team.getName().toLowerCase());
-        String applicationEmail = local + "@" + domainTeam + ".applications.gamemanager.cloud";
+        String applicationEmail = local + "@" + domainTeam + "." + applicationsEmailDomain;
         // Avoid duplicates across API user collection
         if (apiUserRepository.findByEmail(applicationEmail).isPresent())
             throw new TeamException("application_already_exists");

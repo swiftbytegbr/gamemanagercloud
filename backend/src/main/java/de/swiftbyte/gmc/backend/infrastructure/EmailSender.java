@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
@@ -35,6 +37,12 @@ public class EmailSender {
     // GMC_MAIL_ENABLED=false disables all e-mails (verification, 2FA codes, password reset, notifications)
     @Value("${gmc.mail.enabled:true}")
     private boolean enabled;
+
+    @Value("${gmc.instance.operator-name:}")
+    private String operatorName;
+
+    @Value("${gmc.instance.contact-email:}")
+    private String contactEmail;
 
     public boolean isEnabled() {
         return enabled;
@@ -76,8 +84,36 @@ public class EmailSender {
 
     private String renderEmail(String contentHtml, Map<String, String> variables) {
         String baseTemplate = loadTemplate("base_email.html");
-        String contentFilled = fillPlaceholders(contentHtml, variables);
-        return baseTemplate.replace("{{content}}", contentFilled);
+        Map<String, String> all = new HashMap<>(variables);
+        all.put("contact", contactHtml());
+        String contentFilled = fillPlaceholders(contentHtml, all);
+        return baseTemplate.replace("{{footer}}", footerHtml()).replace("{{content}}", contentFilled);
+    }
+
+    // "contact us at <address>" (GMC_CONTACT_EMAIL) or a reference to the administrator of the instance
+    private String contactHtml() {
+        if (isBlank(contactEmail)) return "contact the administrator of this instance";
+        String email = escapeHtml(contactEmail.trim());
+        return "contact us at <a href=\"mailto:" + email + "\" style=\"color:#018bff;\">" + email + "</a>";
+    }
+
+    // Footer: GMC_OPERATOR_NAME | GMC_CONTACT_EMAIL, falling back to the product name
+    private String footerHtml() {
+        List<String> parts = new ArrayList<>();
+        if (!isBlank(operatorName)) parts.add(escapeHtml(operatorName.trim()));
+        if (!isBlank(contactEmail)) {
+            String email = escapeHtml(contactEmail.trim());
+            parts.add("<a href=\"mailto:" + email + "\" style=\"color:#aaa;text-decoration:none;\">" + email + "</a>");
+        }
+        return parts.isEmpty() ? "GameManagerCloud" : String.join(" | ", parts);
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private static String escapeHtml(String value) {
+        return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;");
     }
 
     public void sendVerificationEmail(User user) {

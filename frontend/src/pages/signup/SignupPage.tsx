@@ -79,7 +79,6 @@ export function SignupPage() {
             .then(() => {
                 markAuthenticated();
 
-                sessionStorage.setItem("gmc_show_early_access", "1");
                 router.navigate({ to: "/dashboard" });
                 toast.success("Registration successful");
             })
